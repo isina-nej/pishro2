@@ -174,7 +174,7 @@ cd /opt
 ### 2. دانلود پروژه:
 
 ```bash
-sudo git clone https://github.com/amir-9/pishro.git pishro
+sudo git clone https://github.com/isina-nej/pishro2.git pishro
 cd pishro
 ```
 
@@ -208,9 +208,34 @@ nano .env
 
 ### 2. کپی کردن این محتوا و جایگذاری اطلاعات خودت:
 
+⚠️ **توجه: اگر CPU سرورت AVX ندارد (خطای AVX):**
+- از **MongoDB Atlas** استفاده کن (راه ۱ - پیشنهادی)
+- یا **MongoDB 5** نصب کن (راه ۲)
+
+#### **راه 1: استفاده از MongoDB Atlas (توصیه شده)** ✅
+
 ```env
 # ===========================================
-# DATABASE
+# DATABASE (MongoDB Atlas)
+# ===========================================
+DATABASE_URL="mongodb+srv://pishroAdmin:pishroadmin123@cluster0.7nnhb6v.mongodb.net/pishro?retryWrites=true&w=majority"
+```
+
+#### **راه 2: MongoDB 5 روی سرور**
+
+```bash
+# اجرای اسکریپت نصب
+sudo bash deploy/install-mongodb-5.sh
+
+# سپس در .env:
+DATABASE_URL="mongodb://pishro_user:رمزعبورت@127.0.0.1:27017/pishro?authSource=admin&replicaSet=rs0"
+```
+
+**باقی تنظیمات:**
+
+```env
+# ===========================================
+# DATABASE (اگه روی سرور نصب داری)
 # ===========================================
 DATABASE_URL="mongodb://username:password@host:port/pishro"
 
@@ -450,6 +475,33 @@ ffmpeg -version
 - تست اتصال:
 ```bash
 cat .env | grep DATABASE_URL
+```
+
+### مشکل 3.1: خطای AVX در MongoDB (CPU سرور)
+
+**علامت:**
+```
+Error: processor does not support required feature: AVX
+Error: Not running under VMware or in a Docker environment
+```
+
+**راه‌حل 1: استفاده از MongoDB Atlas** ✅
+```bash
+# فقط این خط رو در .env قرار بده:
+DATABASE_URL="mongodb+srv://pishroAdmin:pishroadmin123@cluster0.7nnhb6v.mongodb.net/pishro?retryWrites=true&w=majority"
+
+# دوباره build کن:
+npm run build
+```
+
+**راه‌حل 2: نصب MongoDB 5 (بدون AVX)**
+```bash
+# اجرای اسکریپت خودکار
+sudo bash deploy/install-mongodb-5.sh
+
+# سپس DATABASE_URL را آپدیت کن
+nano .env
+# DATABASE_URL="mongodb://pishro_user:password@127.0.0.1:27017/pishro?authSource=admin&replicaSet=rs0"
 ```
 
 ### مشکل 4: خطای S3 (Object Storage)
