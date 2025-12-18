@@ -108,7 +108,7 @@ exit
 
 ```bash
 # تست اتصال
-mongosh "mongodb://pishro_admin_user:cms-secure-password-456@localhost:27017/pishro_admin"
+mongosh "mongodb://admin:pishroadmin123@localhost:27017/pishro_admin"
 ```
 
 **⚠️ نکته:** رمز عبور قوی انتخاب کنید و آن را در جای امنی ذخیره کنید.
