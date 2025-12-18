@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:4.4
+    container_name: pishro-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-replica.js:/docker-entrypoint-initdb.d/init-replica.js
+    command: mongod --replSet rs0 --bind_ip_all
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=pishroadmin123
+
+volumes:
+  mongodb_data:
+    driver: local

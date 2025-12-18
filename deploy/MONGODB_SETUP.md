@@ -53,7 +53,7 @@ docker run -d \
   --name pishro-mongo \
   -p 27017:27017 \
   -e MONGO_INITDB_ROOT_USERNAME=admin \
-  -e MONGO_INITDB_ROOT_PASSWORD="sdfjkdsDFsd7943r8eDFA" \
+  -e MONGO_INITDB_ROOT_PASSWORD="pishroadmin123" \
   -v mongodb_data:/data/db \
   --restart unless-stopped \
   mongo:7.0
@@ -62,7 +62,7 @@ docker run -d \
 docker logs -f pishro-mongo
 
 # اتصال به MongoDB shell
-docker exec -it pishro-mongo mongosh -u admin -p "sdfjkdsDFsd7943r8eDFA"
+docker exec -it pishro-mongo mongosh -u admin -p "pishroadmin123"
 ```
 
 ---
