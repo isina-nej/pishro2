@@ -10,10 +10,13 @@ interface BookDetailPageProps {
 
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
   const { slug } = await params;
+  
+  // Decode URL-encoded slug
+  const decodedSlug = decodeURIComponent(slug);
 
   // Find book by slug to get the ID
   const book = await prisma.digitalBook.findUnique({
-    where: { slug },
+    where: { slug: decodedSlug },
     select: { id: true },
   });
 

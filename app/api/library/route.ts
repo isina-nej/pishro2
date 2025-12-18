@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (format) {
-      where.formats = { has: format };
+      where.formats = { in: [format] };
     }
 
     if (search) {

@@ -13,6 +13,7 @@ import {
   Building,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface BookDetailProps {
   bookId: string;
@@ -20,6 +21,42 @@ interface BookDetailProps {
 
 const BookDetail = ({ bookId }: BookDetailProps) => {
   const { data: book, isLoading, error } = useBookDetail(bookId);
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  const handleDownload = async (type: "pdf" | "cover" | "audio") => {
+    try {
+      setDownloading(type);
+      const response = await fetch(
+        `/api/library/${bookId}/download/${type}`
+      );
+      
+      if (!response.ok) {
+        throw new Error("خطا در دانلود فایل");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      
+      // نام فایل بر اساس نوع
+      const fileName = 
+        type === "pdf" ? `${book?.slug}.pdf` :
+        type === "cover" ? `${book?.slug}-cover.jpg` :
+        `${book?.slug}-audio.mp3`;
+      
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("خطا در دانلود:", error);
+      alert("خطا در دانلود فایل");
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -58,6 +95,10 @@ const BookDetail = ({ bookId }: BookDetailProps) => {
                     fill
                     className="object-cover"
                     priority
+                    onError={(e) => {
+                      console.error(`Failed to load image: ${book.cover}`);
+                      // Fallback to placeholder or hide
+                    }}
                   />
                 </div>
               )}
@@ -101,16 +142,40 @@ const BookDetail = ({ bookId }: BookDetailProps) => {
               </div>
 
               {book.fileUrl && (
-                <Button className="w-full mt-4" size="lg">
+                <Button 
+                  onClick={() => handleDownload("pdf")}
+                  disabled={downloading === "pdf"}
+                  className="w-full mt-4" 
+                  size="lg"
+                >
                   <Download className="w-4 h-4 mr-2" />
-                  دانلود کتاب
+                  {downloading === "pdf" ? "در حال دانلود..." : "دانلود PDF"}
                 </Button>
               )}
 
               {book.audioUrl && (
-                <Button className="w-full mt-2" variant="outline" size="lg">
+                <Button 
+                  onClick={() => handleDownload("audio")}
+                  disabled={downloading === "audio"}
+                  className="w-full mt-2" 
+                  variant="outline" 
+                  size="lg"
+                >
                   <BookOpen className="w-4 h-4 mr-2" />
-                  نسخه صوتی
+                  {downloading === "audio" ? "در حال دانلود..." : "دانلود صوتی"}
+                </Button>
+              )}
+
+              {book.cover && (
+                <Button 
+                  onClick={() => handleDownload("cover")}
+                  disabled={downloading === "cover"}
+                  className="w-full mt-2" 
+                  variant="ghost" 
+                  size="lg"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {downloading === "cover" ? "در حال دانلود..." : "دانلود کاور"}
                 </Button>
               )}
             </div>

@@ -20,7 +20,23 @@ const nextConfig: NextConfig = {
         hostname: "www.pishrosarmaye.com",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        pathname: "/uploads/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost:3000",
+        pathname: "/uploads/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost:3001",
+        pathname: "/uploads/**",
+      },
     ],
+    unoptimized: process.env.NODE_ENV === "development",
   },
 };
 

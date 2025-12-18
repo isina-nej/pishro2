@@ -288,7 +288,7 @@ sudo apt-get install -y nginx
 ### 2. ایجاد فایل تنظیمات برای CMS
 
 ```bash
-sudo nano /etc/nginx/sites-available/pishro-cms
+sudo nano /etc/nginx/sites-available/pishro-app
 ```
 
 **محتوای فایل (بدون SSL):**
@@ -296,10 +296,10 @@ sudo nano /etc/nginx/sites-available/pishro-cms
 ```nginx
 server {
     listen 80;
-    server_name admin.your-domain.com;
+    server_name pishrosarmaye.com www.pishrosarmaye.com;
 
     location / {
-        proxy_pass http://localhost:3001;
+        proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -317,7 +317,7 @@ server {
 ```nginx
 server {
     listen 80;
-    server_name 178.239.147.136;
+    server_name 178.239.147.136 ;
 
     # CMS در مسیر /admin
     location /admin {

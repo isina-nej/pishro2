@@ -157,10 +157,12 @@ certbot 1.x.x
 
 ### مرحله 1: تنظیم اولیه Nginx
 
-ابتدا باید یک فایل پیکربندی برای سایتت بسازی:
+ابتدا باید فایل‌های پیکربندی برای سایت‌ها بسازی:
+
+#### App Main (port 3000):
 
 ```bash
-sudo nano /etc/nginx/sites-available/pishro
+sudo nano /etc/nginx/sites-available/pishro-app
 ```
 
 محتوای فایل:
@@ -172,13 +174,40 @@ server {
 
     location / {
         proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+#### CMS/Admin (port 3001):
+
+```bash
+sudo nano /etc/nginx/sites-available/pishro-admin
+```
+
+محتوای فایل:
+
+```nginx
+server {
+    listen 80;
+    server_name admin.pishrosarmaye.com;
+
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
         proxy_cache_bypass $http_upgrade;
     }
 }
@@ -186,18 +215,15 @@ server {
 
 **نکته:** `pishrosarmaye.com` رو با دامنه واقعیت جایگذین کن!
 
-### ذخیره فایل:
-
-- `Ctrl + O` → `Enter` → `Ctrl + X`
-
-### فعال کردن سایت:
+### فعال کردن سایت‌ها:
 
 ```bash
-# ایجاد symlink
-sudo ln -s /etc/nginx/sites-available/pishro /etc/nginx/sites-enabled/
+# ایجاد symlink برای هر دو
+sudo ln -s /etc/nginx/sites-available/pishro-app /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/pishro-admin /etc/nginx/sites-enabled/
 
-# حذف سایت پیش‌فرض
-sudo rm /etc/nginx/sites-enabled/default
+# حذف سایت پیش‌فرض اگر وجود داشت
+sudo rm -f /etc/nginx/sites-enabled/default
 
 # تست پیکربندی
 sudo nginx -t
@@ -209,7 +235,7 @@ sudo systemctl restart nginx
 ### مرحله 2: دریافت گواهی SSL
 
 ```bash
-sudo certbot --nginx -d pishrosarmaye.com -d www.pishrosarmaye.com
+sudo certbot --nginx -d pishrosarmaye.com -d www.pishrosarmaye.com -d admin.pishrosarmaye.com
 ```
 
 **جایگذاری:**
@@ -348,10 +374,28 @@ sudo cat /etc/cron.d/certbot
 
 ## 9. تست و بررسی
 
-### 1. باز کردن سایت با HTTPS:
+### ✅ وضعیت نهایی (18 دسامبر 2025)
 
 ```
+Found the following certs:
+  Certificate Name: pishrosarmaye.com
+    Domains: pishrosarmaye.com admin.pishrosarmaye.com www.pishrosarmaye.com
+    Expiry Date: 2026-03-18 (VALID: 89 days)
+    Certificate Path: /etc/letsencrypt/live/pishrosarmaye.com/fullchain.pem
+    Private Key Path: /etc/letsencrypt/live/pishrosarmaye.com/privkey.pem
+```
+
+### 1. باز کردن سایت‌ها با HTTPS:
+
+**Main App:**
+```
 https://pishrosarmaye.com
+https://www.pishrosarmaye.com
+```
+
+**CMS/Admin:**
+```
+https://admin.pishrosarmaye.com
 ```
 
 باید:
