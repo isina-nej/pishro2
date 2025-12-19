@@ -95,7 +95,7 @@ const BookDetail = ({ bookId }: BookDetailProps) => {
                     fill
                     className="object-cover"
                     priority
-                    onError={(e) => {
+                    onError={() => {
                       console.error(`Failed to load image: ${book.cover}`);
                       // Fallback to placeholder or hide
                     }}

@@ -1,6 +1,4 @@
 import { NextRequest } from "next/server";
-import { readFile } from "fs/promises";
-import { join } from "path";
 import { prisma } from "@/lib/prisma";
 import {
   errorResponse,
@@ -10,13 +8,18 @@ import {
 interface RouteParams {
   params: Promise<{
     id: string;
-    type: "pdf" | "cover" | "audio";
+    type: string;
   }>;
 }
 
-export async function GET(req: NextRequest, { params }: RouteParams) {
+export async function GET(_req: NextRequest, { params }: RouteParams) {
   try {
     const { id, type } = await params;
+
+    // Validate type is one of the allowed values
+    if (!['pdf', 'cover', 'audio'].includes(type)) {
+      return errorResponse("نوع فایل نامعتبر است", ErrorCodes.INVALID_INPUT);
+    }
 
     console.log(`[Download] Request: id=${id}, type=${type}`);
 

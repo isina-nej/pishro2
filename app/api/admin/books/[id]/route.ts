@@ -67,7 +67,6 @@ export async function GET(
     // Fetch with relations
     const bookWithRelations = await prisma.digitalBook.findUnique({
       where: { id },
-      // @ts-expect-error - Prisma typing issue with relations
       include: {
         relatedTags: {
           select: {
@@ -196,7 +195,6 @@ export async function PATCH(
     // Fetch the complete book with relations
     const completeBook = await prisma.digitalBook.findUnique({
       where: { id },
-      // @ts-expect-error - Prisma typing issue with relations
       include: {
         relatedTags: {
           select: {

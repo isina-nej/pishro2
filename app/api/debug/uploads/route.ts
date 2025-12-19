@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { readdir } from "fs/promises";
 import { join } from "path";
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const uploadDirs = [
       { name: "pdfs", path: join(process.cwd(), "public", "uploads", "books", "pdfs") },
@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
       { name: "audio", path: join(process.cwd(), "public", "uploads", "books", "audio") },
     ];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: Record<string, any> = {
       cwd: process.cwd(),
       dirs: {},
@@ -23,10 +24,11 @@ export async function GET(req: NextRequest) {
           files: files.filter(f => f !== '.gitkeep'),
           count: files.filter(f => f !== '.gitkeep').length,
         };
-      } catch (err: any) {
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         result.dirs[dir.name] = {
           path: dir.path,
-          error: err.message,
+          error: errorMessage,
         };
       }
     }

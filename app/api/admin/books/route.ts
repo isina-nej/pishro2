@@ -5,7 +5,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { Prisma, ObjectId } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -212,13 +212,19 @@ export async function POST(req: NextRequest) {
         formats,
         status,
         tags,
-        tagIds: validTagIds,
         readingTime,
         isFeatured,
         price,
         fileUrl,
         audioUrl,
+        // Set tagIds for the relation
+        ...(validTagIds.length > 0 && { tagIds: validTagIds }),
       },
+    });
+
+    // Fetch the book with related tags included
+    const bookWithTags = await prisma.digitalBook.findUnique({
+      where: { id: book.id },
       include: {
         relatedTags: {
           select: {
@@ -231,7 +237,7 @@ export async function POST(req: NextRequest) {
     });
 
     console.log("Book created successfully:", book.id);
-    return createdResponse(book, "Book created successfully");
+    return createdResponse(bookWithTags, "Book created successfully");
   } catch (error) {
     console.error("Error creating book - Full error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
