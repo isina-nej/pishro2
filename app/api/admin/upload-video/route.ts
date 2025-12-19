@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { writeFile } from "fs/promises";
 import { auth } from "@/auth";
 import {
   successResponse,
@@ -9,6 +8,11 @@ import {
   errorResponse,
   ErrorCodes,
 } from "@/lib/api-response";
+import {
+  VIDEOS_UPLOAD_PATHS,
+  ensureUploadDirExists,
+  generateFileUrl,
+} from "@/lib/upload-config";
 
 // تنظیمات مجاز برای آپلود ویدیو
 const MAX_FILE_SIZE = 256 * 1024 * 1024; // 256MB
@@ -80,21 +84,22 @@ export async function POST(req: NextRequest) {
     const filename = `video_${timestamp}_${randomString}.${extension}`;
 
     // مسیر ذخیره فایل
-    const uploadDir = join(process.cwd(), "public", "uploads", "videos");
-    const filepath = join(uploadDir, filename);
+    const uploadDir = VIDEOS_UPLOAD_PATHS.videos.dir;
+    const filepath = `${uploadDir}\\${filename}`;
 
     // ایجاد دایرکتوری اگر وجود ندارد
     try {
-      await mkdir(uploadDir, { recursive: true });
+      await ensureUploadDirExists(uploadDir);
     } catch (err) {
       console.error("Error creating directory:", err);
+      throw err;
     }
 
     // ذخیره فایل
     await writeFile(filepath, buffer);
 
     // URL نسبی فایل
-    const videoUrl = `/uploads/videos/${filename}`;
+    const videoUrl = generateFileUrl("video", filename);
 
     return successResponse(
       {

@@ -6,6 +6,7 @@
  */
 
 import { NextRequest } from "next/server";
+import { unlink } from "fs/promises";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -18,6 +19,26 @@ import {
   noContentResponse,
 } from "@/lib/api-response";
 import { normalizeImageUrl } from "@/lib/utils";
+import { getFilePathFromUrl } from "@/lib/upload-config";
+
+/**
+ * Helper function to delete a file from the filesystem
+ */
+async function deleteFileFromDisk(fileUrl: string | null): Promise<void> {
+  if (!fileUrl) return;
+
+  try {
+    // Get the full file path using the upload config helper
+    const filePath = getFilePathFromUrl(fileUrl);
+    if (filePath) {
+      await unlink(filePath);
+      console.log(`File deleted: ${filePath}`);
+    }
+  } catch (err) {
+    console.error(`Error deleting file ${fileUrl}:`, err);
+    // Continue deletion even if file doesn't exist
+  }
+}
 
 export async function GET(
   req: NextRequest,
@@ -37,6 +58,16 @@ export async function GET(
 
     const book = await prisma.digitalBook.findUnique({
       where: { id },
+    });
+
+    if (!book) {
+      return notFoundResponse("Book", "Book not found");
+    }
+
+    // Fetch with relations
+    const bookWithRelations = await prisma.digitalBook.findUnique({
+      where: { id },
+      // @ts-expect-error - Prisma typing issue with relations
       include: {
         relatedTags: {
           select: {
@@ -48,11 +79,7 @@ export async function GET(
       },
     });
 
-    if (!book) {
-      return notFoundResponse("Book", "Book not found");
-    }
-
-    return successResponse(book);
+    return successResponse(bookWithRelations);
   } catch (error) {
     console.error("Error fetching book:", error);
     return errorResponse(
@@ -102,6 +129,33 @@ export async function PATCH(
       }
     }
 
+    // Handle file replacements - delete old files if new ones are provided
+    console.log("Checking for file updates...");
+
+    // If PDF file is being replaced
+    if (body.fileUrl !== undefined && body.fileUrl !== existingBook.fileUrl) {
+      if (existingBook.fileUrl) {
+        console.log("Deleting old PDF file...");
+        await deleteFileFromDisk(existingBook.fileUrl);
+      }
+    }
+
+    // If cover image is being replaced
+    if (body.cover !== undefined && body.cover !== existingBook.cover) {
+      if (existingBook.cover) {
+        console.log("Deleting old cover image...");
+        await deleteFileFromDisk(existingBook.cover);
+      }
+    }
+
+    // If audio file is being replaced
+    if (body.audioUrl !== undefined && body.audioUrl !== existingBook.audioUrl) {
+      if (existingBook.audioUrl) {
+        console.log("Deleting old audio file...");
+        await deleteFileFromDisk(existingBook.audioUrl);
+      }
+    }
+
     // Prepare update data
     const updateData: Record<string, unknown> = {};
 
@@ -134,9 +188,15 @@ export async function PATCH(
     if (body.fileUrl !== undefined) updateData.fileUrl = body.fileUrl;
     if (body.audioUrl !== undefined) updateData.audioUrl = body.audioUrl;
 
-    const updatedBook = await prisma.digitalBook.update({
+    await prisma.digitalBook.update({
       where: { id },
       data: updateData,
+    });
+
+    // Fetch the complete book with relations
+    const completeBook = await prisma.digitalBook.findUnique({
+      where: { id },
+      // @ts-expect-error - Prisma typing issue with relations
       include: {
         relatedTags: {
           select: {
@@ -148,7 +208,7 @@ export async function PATCH(
       },
     });
 
-    return successResponse(updatedBook, "Book updated successfully");
+    return successResponse(completeBook, "Book updated successfully");
   } catch (error) {
     console.error("Error updating book:", error);
     return errorResponse(
@@ -183,11 +243,30 @@ export async function DELETE(
       return notFoundResponse("Book", "Book not found");
     }
 
-    // Delete book
+    // Delete associated files from disk
+    console.log("Deleting book files...");
+    
+    // Delete PDF file
+    if (existingBook.fileUrl) {
+      await deleteFileFromDisk(existingBook.fileUrl);
+    }
+
+    // Delete cover image
+    if (existingBook.cover) {
+      await deleteFileFromDisk(existingBook.cover);
+    }
+
+    // Delete audio file
+    if (existingBook.audioUrl) {
+      await deleteFileFromDisk(existingBook.audioUrl);
+    }
+
+    // Delete book from database
     await prisma.digitalBook.delete({
       where: { id },
     });
 
+    console.log(`Book and all associated files deleted: ${id}`);
     return noContentResponse();
   } catch (error) {
     console.error("Error deleting book:", error);

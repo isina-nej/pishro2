@@ -4,14 +4,18 @@
  */
 
 import { NextRequest } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { writeFile } from "fs/promises";
 import {
   successResponse,
   validationError,
   errorResponse,
   ErrorCodes,
 } from "@/lib/api-response";
+import {
+  BOOKS_UPLOAD_PATHS,
+  ensureUploadDirExists,
+  generateFileUrl,
+} from "@/lib/upload-config";
 
 // تنظیمات مجاز برای آپلود PDF کتاب
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
@@ -72,13 +76,13 @@ export async function POST(req: NextRequest) {
     const filename = `book_${timestamp}_${randomString}.pdf`;
 
     // مسیر ذخیره فایل
-    const uploadDir = join(process.cwd(), "public", "uploads", "books", "pdfs");
-    const filepath = join(uploadDir, filename);
+    const uploadDir = BOOKS_UPLOAD_PATHS.pdfs.dir;
+    const filepath = `${uploadDir}\\${filename}`;
 
     console.log("Creating upload directory:", uploadDir);
     // ایجاد دایرکتوری اگر وجود ندارد
     try {
-      await mkdir(uploadDir, { recursive: true });
+      await ensureUploadDirExists(uploadDir);
       console.log("Upload directory created successfully");
     } catch (err) {
       console.error("Error creating directory:", err);
@@ -96,7 +100,7 @@ export async function POST(req: NextRequest) {
     }
 
     // URL نسبی فایل
-    const pdfUrl = `/uploads/books/pdfs/${filename}`;
+    const pdfUrl = generateFileUrl("pdf", filename);
 
     console.log("Upload successful:", { pdfUrl, fileName: file.name });
     return successResponse(

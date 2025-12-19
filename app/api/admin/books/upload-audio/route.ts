@@ -1,12 +1,16 @@
 import { NextRequest } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { writeFile } from "fs/promises";
 import {
   successResponse,
   validationError,
   errorResponse,
   ErrorCodes,
 } from "@/lib/api-response";
+import {
+  BOOKS_UPLOAD_PATHS,
+  ensureUploadDirExists,
+  generateFileUrl,
+} from "@/lib/upload-config";
 
 // تنظیمات برای آپلود صوت کتاب
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
@@ -59,21 +63,22 @@ export async function POST(req: NextRequest) {
     const filename = `audio_${timestamp}_${randomString}.${extension}`;
 
     // مسیر ذخیره فایل
-    const uploadDir = join(process.cwd(), "public", "uploads", "books", "audio");
-    const filepath = join(uploadDir, filename);
+    const uploadDir = BOOKS_UPLOAD_PATHS.audio.dir;
+    const filepath = `${uploadDir}\\${filename}`;
 
     // ایجاد دایرکتوری اگر وجود ندارد
     try {
-      await mkdir(uploadDir, { recursive: true });
+      await ensureUploadDirExists(uploadDir);
     } catch (err) {
       console.error("Error creating directory:", err);
+      throw err;
     }
 
     // ذخیره فایل
     await writeFile(filepath, buffer);
 
     // URL نسبی فایل
-    const audioUrl = `/uploads/books/audio/${filename}`;
+    const audioUrl = generateFileUrl("audio", filename);
 
     return successResponse(
       {

@@ -135,15 +135,16 @@ export async function POST(req: NextRequest) {
     } = body;
 
     // Validation
-    if (!title || !slug || !author || !description || !year || !category) {
-      return validationError({
-        title: !title ? "Title is required" : "",
-        slug: !slug ? "Slug is required" : "",
-        author: !author ? "Author is required" : "",
-        description: !description ? "Description is required" : "",
-        year: !year ? "Year is required" : "",
-        category: !category ? "Category is required" : "",
-      });
+    const validationErrors: { [key: string]: string } = {};
+    if (!title) validationErrors.title = "Title is required";
+    if (!slug) validationErrors.slug = "Slug is required";
+    if (!author) validationErrors.author = "Author is required";
+    if (!description) validationErrors.description = "Description is required";
+    if (!year) validationErrors.year = "Year is required";
+    if (!category) validationErrors.category = "Category is required";
+
+    if (Object.keys(validationErrors).length > 0) {
+      return validationError(validationErrors);
     }
 
     // Check if slug already exists
