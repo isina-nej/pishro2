@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
-import { join } from "path";
+import { join, resolve } from "path";
 import { existsSync } from "fs";
 
-// Serve uploaded files from the shared admin folder
+// Serve uploaded files from the centralized upload directory
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
@@ -17,22 +17,20 @@ export async function GET(
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    // Path to the shared admin uploads folder
-    const sharedUploadsDir = join(
-      process.cwd(),
-      "..",
-      "pishro-admin2",
-      "public",
-      "uploads"
-    );
-    const fullPath = join(sharedUploadsDir, filePath);
+    // Path to the centralized uploads directory
+    let uploadBaseDir = process.env.UPLOAD_BASE_DIR || join("D:", "pishro_uploads");
+    uploadBaseDir = resolve(uploadBaseDir);
+    
+    const fullPath = join(uploadBaseDir, filePath);
 
     // Verify the file exists and is within the uploads directory
-    if (!fullPath.startsWith(sharedUploadsDir)) {
+    if (!fullPath.startsWith(uploadBaseDir)) {
+      console.warn(`Security: attempted path traversal: ${fullPath}`);
       return new NextResponse("Not Found", { status: 404 });
     }
 
     if (!existsSync(fullPath)) {
+      console.warn(`File not found: ${fullPath}`);
       return new NextResponse("Not Found", { status: 404 });
     }
 

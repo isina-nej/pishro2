@@ -5,7 +5,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { Prisma } from "@prisma/client";
+import { Prisma, ObjectId } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -147,6 +147,17 @@ export async function POST(req: NextRequest) {
       return validationError(validationErrors);
     }
 
+    // Validate and filter tagIds to only valid MongoDB ObjectIds
+    let validTagIds: string[] = [];
+    if (Array.isArray(tagIds) && tagIds.length > 0) {
+      validTagIds = tagIds.filter((id) => {
+        // MongoDB ObjectId is a 24-character hex string
+        return typeof id === "string" && /^[a-f\d]{24}$/i.test(id);
+      });
+    }
+
+    console.log("Creating book with tagIds:", { provided: tagIds, validated: validTagIds });
+
     // Check if slug already exists
     const existingBook = await prisma.digitalBook.findUnique({
       where: { slug },
@@ -161,6 +172,24 @@ export async function POST(req: NextRequest) {
 
     // Normalize cover URL (extract original URL from Next.js optimization URLs)
     const normalizedCover = normalizeImageUrl(cover);
+
+    // Log request data for debugging
+    console.log("Creating book with data:", {
+      title,
+      slug,
+      author,
+      description,
+      cover: normalizedCover,
+      year,
+      pages,
+      category,
+      formats,
+      status,
+      tags,
+      tagIds: validTagIds,
+      fileUrl,
+      audioUrl,
+    });
 
     // Create book
     const book = await prisma.digitalBook.create({
@@ -183,7 +212,7 @@ export async function POST(req: NextRequest) {
         formats,
         status,
         tags,
-        tagIds,
+        tagIds: validTagIds,
         readingTime,
         isFeatured,
         price,
@@ -201,11 +230,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log("Book created successfully:", book.id);
     return createdResponse(book, "Book created successfully");
   } catch (error) {
-    console.error("Error creating book:", error);
+    console.error("Error creating book - Full error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error details:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: errorMessage,
+      cause: error instanceof Error && error.cause ? String(error.cause) : undefined,
+    });
     return errorResponse(
-      "Error creating book",
+      `Error creating book: ${errorMessage}`,
       ErrorCodes.DATABASE_ERROR
     );
   }

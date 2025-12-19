@@ -2,13 +2,11 @@ import axios from "axios";
 import type { Course } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ApiSuccessResponse } from "@/lib/api-response";
+import { getBaseUrl } from "@/lib/get-base-url";
 
 export async function getCourses(): Promise<Course[]> {
   try {
-    const baseUrl =
-      process.env.NODE_ENV === "production"
-        ? process.env.NEXT_PUBLIC_BASE_URL || window.location.origin
-        : "http://localhost:3000";
+    const baseUrl = getBaseUrl();
     const { data } = await axios.get<ApiSuccessResponse<Course[]>>(
       `${baseUrl}/api/courses`,
       {}

@@ -33,17 +33,17 @@ export const BOOKS_UPLOAD_PATHS = {
   // PDF files
   pdfs: {
     dir: join(BASE_UPLOAD_DIR, "books", "pdfs"),
-    url: "/api/downloads/books/pdfs",
+    url: "/api/uploads/books/pdfs",
   },
   // Cover images
   covers: {
     dir: join(BASE_UPLOAD_DIR, "books", "covers"),
-    url: "/api/downloads/books/covers",
+    url: "/api/uploads/books/covers",
   },
   // Audio files
   audio: {
     dir: join(BASE_UPLOAD_DIR, "books", "audio"),
-    url: "/api/downloads/books/audio",
+    url: "/api/uploads/books/audio",
   },
 };
 
@@ -53,7 +53,7 @@ export const BOOKS_UPLOAD_PATHS = {
 export const VIDEOS_UPLOAD_PATHS = {
   videos: {
     dir: join(BASE_UPLOAD_DIR, "videos"),
-    url: "/api/downloads/videos",
+    url: "/api/uploads/videos",
   },
 };
 
