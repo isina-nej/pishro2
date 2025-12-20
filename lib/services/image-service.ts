@@ -2,7 +2,6 @@
 import { prisma } from "@/lib/prisma";
 import { ImageCategory } from "@prisma/client";
 import crypto from "crypto";
-import sharp from "sharp";
 import {
   saveFileToStorage,
   deleteFileFromStorage,
@@ -70,14 +69,10 @@ export function isValidImageSize(
  * دریافت ابعاد تصویر
  */
 export async function getImageDimensions(
-  buffer: Buffer
+  _buffer: Buffer
 ): Promise<{ width: number; height: number } | null> {
   try {
     // Disabled Sharp due to CPU architecture incompatibility in production
-    // const metadata = await sharp(buffer).metadata();
-    // if (metadata.width && metadata.height) {
-    //   return { width: metadata.width, height: metadata.height };
-    // }
     return null;
   } catch (error) {
     console.error("Error getting image dimensions:", error);
