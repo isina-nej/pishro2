@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import {
   successResponse,
@@ -15,6 +15,20 @@ import {
 // تنظیمات برای آپلود کاور کتاب
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+// CORS headers
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, { headers: corsHeaders() });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -56,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     // مسیر ذخیره فایل
     const uploadDir = BOOKS_UPLOAD_PATHS.covers.dir;
-    const filepath = `${uploadDir}\\${filename}`;
+    const filepath = `${uploadDir}/${filename}`.replace(/\\/g, "/");
 
     // ایجاد دایرکتوری اگر وجود ندارد
     try {
@@ -72,7 +86,7 @@ export async function POST(req: NextRequest) {
     // URL نسبی فایل
     const coverUrl = generateFileUrl("cover", filename);
 
-    return successResponse(
+    const response = successResponse(
       {
         fileName: filename,
         fileUrl: coverUrl,
@@ -82,11 +96,23 @@ export async function POST(req: NextRequest) {
       },
       "تصویر کاور با موفقیت آپلود شد"
     );
+    
+    // Add CORS headers to response
+    for (const [key, value] of Object.entries(corsHeaders())) {
+      response.headers.set(key, value);
+    }
+    return response;
   } catch (error) {
     console.error("Cover upload error:", error);
-    return errorResponse(
+    const response = errorResponse(
       "خطایی در آپلود تصویر کاور رخ داد",
       ErrorCodes.INTERNAL_ERROR
     );
+    
+    // Add CORS headers to error response
+    for (const [key, value] of Object.entries(corsHeaders())) {
+      response.headers.set(key, value);
+    }
+    return response;
   }
 }

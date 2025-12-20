@@ -41,7 +41,9 @@ export async function saveFileToStorage(
   relativePath: string
 ): Promise<string> {
   const config = getStorageConfig();
-  const fullPath = join(config.storagePath, relativePath);
+  // Normalize path to use forward slashes consistently
+  const normalizedPath = relativePath.replace(/\\/g, "/");
+  const fullPath = join(config.storagePath, normalizedPath).replace(/\\/g, "/");
 
   // ایجاد دایرکتوری اگر وجود ندارد
   const directory = fullPath.substring(0, fullPath.lastIndexOf("/"));
