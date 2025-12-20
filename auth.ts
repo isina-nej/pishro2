@@ -23,8 +23,8 @@ export const authConfig: NextAuthConfig = {
       name: "authjs.session-token",
       options: {
         httpOnly: true,
-        sameSite: "none", // ⬅️ برای Cross-Origin ضروری
-        secure: true, // ⬅️ چون دامنه‌هات HTTPS هستن
+        sameSite: "lax", // ⬅️ localhost برای HTTP بهتر کار می‌کند
+        secure: process.env.NODE_ENV === "production", // ⬅️ فقط در production
       },
     },
   },
