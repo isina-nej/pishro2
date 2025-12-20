@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
         pathname: "/uploads/**",
       },
     ],
-    unoptimized: process.env.NODE_ENV === "development",
+    unoptimized: true,
   },
 };
 
