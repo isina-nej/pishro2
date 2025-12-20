@@ -6,7 +6,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const homeLanding = await getHomeLandingData();
 
   return {
-    title: "52392950",
+    title: "پیشرو سرمایه",
     description:
       homeLanding?.metaDescription ||
       "آموزش تخصصی بورس، بازارهای مالی و سرمایه‌ گذاری. از آموزش اصولی تا مشاوره حرفه‌ای",

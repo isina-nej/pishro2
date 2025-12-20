@@ -27,7 +27,7 @@ const montserrat = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "52392950",
+  title: "پیشرو سرمایه",
   description: "پیشرو",
 };
 
