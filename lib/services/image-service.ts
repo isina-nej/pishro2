@@ -73,10 +73,11 @@ export async function getImageDimensions(
   buffer: Buffer
 ): Promise<{ width: number; height: number } | null> {
   try {
-    const metadata = await sharp(buffer).metadata();
-    if (metadata.width && metadata.height) {
-      return { width: metadata.width, height: metadata.height };
-    }
+    // Disabled Sharp due to CPU architecture incompatibility in production
+    // const metadata = await sharp(buffer).metadata();
+    // if (metadata.width && metadata.height) {
+    //   return { width: metadata.width, height: metadata.height };
+    // }
     return null;
   } catch (error) {
     console.error("Error getting image dimensions:", error);
