@@ -3,7 +3,7 @@
  * POST /api/admin/books/upload-pdf - Upload a PDF file for a digital book
  */
 
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import {
   successResponse,
@@ -21,6 +21,20 @@ import {
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 const ALLOWED_TYPES = ["application/pdf"];
 const ALLOWED_EXTENSIONS = ["pdf"];
+
+// CORS headers
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, { headers: corsHeaders() });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -77,7 +91,7 @@ export async function POST(req: NextRequest) {
 
     // مسیر ذخیره فایل
     const uploadDir = BOOKS_UPLOAD_PATHS.pdfs.dir;
-    const filepath = `${uploadDir}\\${filename}`;
+    const filepath = `${uploadDir}/${filename}`.replace(/\\/g, "/");
 
     console.log("Creating upload directory:", uploadDir);
     // ایجاد دایرکتوری اگر وجود ندارد
@@ -103,7 +117,7 @@ export async function POST(req: NextRequest) {
     const pdfUrl = generateFileUrl("pdf", filename);
 
     console.log("Upload successful:", { pdfUrl, fileName: file.name });
-    return successResponse(
+    const response = successResponse(
       {
         fileName: file.name,
         fileUrl: pdfUrl,
@@ -113,11 +127,23 @@ export async function POST(req: NextRequest) {
       },
       "فایل PDF با موفقیت آپلود شد"
     );
+    
+    // Add CORS headers to response
+    for (const [key, value] of Object.entries(corsHeaders())) {
+      response.headers.set(key, value);
+    }
+    return response;
   } catch (error) {
     console.error("Error uploading PDF:", error);
-    return errorResponse(
+    const response = errorResponse(
       "خطا در آپلود فایل PDF: " + (error instanceof Error ? error.message : String(error)),
       ErrorCodes.INTERNAL_ERROR
     );
+    
+    // Add CORS headers to error response
+    for (const [key, value] of Object.entries(corsHeaders())) {
+      response.headers.set(key, value);
+    }
+    return response;
   }
 }

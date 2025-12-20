@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import {
   successResponse,
@@ -23,6 +23,20 @@ const ALLOWED_TYPES = [
   "audio/aac",
   "audio/m4a",
 ];
+
+// CORS headers
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, { headers: corsHeaders() });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -64,7 +78,7 @@ export async function POST(req: NextRequest) {
 
     // مسیر ذخیره فایل
     const uploadDir = BOOKS_UPLOAD_PATHS.audio.dir;
-    const filepath = `${uploadDir}\\${filename}`;
+    const filepath = `${uploadDir}/${filename}`.replace(/\\/g, "/");
 
     // ایجاد دایرکتوری اگر وجود ندارد
     try {
@@ -80,7 +94,7 @@ export async function POST(req: NextRequest) {
     // URL نسبی فایل
     const audioUrl = generateFileUrl("audio", filename);
 
-    return successResponse(
+    const response = successResponse(
       {
         fileName: filename,
         fileUrl: audioUrl,
@@ -90,11 +104,23 @@ export async function POST(req: NextRequest) {
       },
       "فایل صوتی با موفقیت آپلود شد"
     );
+    
+    // Add CORS headers to response
+    for (const [key, value] of Object.entries(corsHeaders())) {
+      response.headers.set(key, value);
+    }
+    return response;
   } catch (error) {
     console.error("Audio upload error:", error);
-    return errorResponse(
+    const response = errorResponse(
       "خطایی در آپلود فایل صوتی رخ داد",
       ErrorCodes.INTERNAL_ERROR
     );
+    
+    // Add CORS headers to error response
+    for (const [key, value] of Object.entries(corsHeaders())) {
+      response.headers.set(key, value);
+    }
+    return response;
   }
 }
