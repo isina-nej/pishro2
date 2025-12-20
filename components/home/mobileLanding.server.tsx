@@ -17,7 +17,7 @@ export default async function MobileLandingServer() {
   const slidesData = slides.map((slide) => ({
     src: slide.imageUrl,
     title: slide.title,
-    text: slide.description,
+    text: slide.description || "",
   }));
 
   return (

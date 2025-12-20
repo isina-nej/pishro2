@@ -20,7 +20,7 @@ export default async function LandingOverlayServer() {
   const slidesData = slides.map((slide) => ({
     src: slide.imageUrl,
     title: slide.title,
-    text: slide.description,
+    text: slide.description || "",
   }));
 
   const miniSlider1Data = miniSlider1.map((s) => s.imageUrl);
