@@ -23,17 +23,31 @@ const ALLOWED_TYPES = ["application/pdf"];
 const ALLOWED_EXTENSIONS = ["pdf"];
 
 // CORS headers
-function corsHeaders() {
+function corsHeaders(req: NextRequest) {
+  const origin = req.headers.get("origin") || "";
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
+    "https://admin.pishrosarmaye.com",
+    "https://www.pishrosarmaye.com",
+    "https://pishrosarmaye.com",
+  ];
+  
+  const isOriginAllowed = allowedOrigins.includes(origin);
+  
   return {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": isOriginAllowed ? origin : "*",
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Credentials": isOriginAllowed ? "true" : "false",
   };
 }
 
 // Handle CORS preflight
-export async function OPTIONS() {
-  return new NextResponse(null, { headers: corsHeaders() });
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { headers: corsHeaders(req) });
 }
 
 export async function POST(req: NextRequest) {
@@ -129,7 +143,7 @@ export async function POST(req: NextRequest) {
     );
     
     // Add CORS headers to response
-    for (const [key, value] of Object.entries(corsHeaders())) {
+    for (const [key, value] of Object.entries(corsHeaders(req))) {
       response.headers.set(key, value);
     }
     return response;
@@ -141,7 +155,7 @@ export async function POST(req: NextRequest) {
     );
     
     // Add CORS headers to error response
-    for (const [key, value] of Object.entries(corsHeaders())) {
+    for (const [key, value] of Object.entries(corsHeaders(req))) {
       response.headers.set(key, value);
     }
     return response;

@@ -212,7 +212,7 @@ const OverlayMainText = ({
 }) => (
   <div className="h-screen container-xl pt-20 sm:pt-24 md:pt-32 px-4 sm:px-6 flex flex-col items-start justify-start space-y-4 sm:space-y-6 md:space-y-8">
     <h4 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[88px] font-extrabold leading-tight max-w-4xl">
-      {title || "پیشرو بزرگترین مؤسسه سرمایه‌ گذاری در ایران"}
+      {title || "خوش آمدید و جایگزین کردن خانواده بزرگ پیشرو"}
     </h4>
 
     <motion.a

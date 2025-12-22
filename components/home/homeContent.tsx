@@ -23,7 +23,7 @@ export default function HomePageContent() {
       <MobileScrollSectionServer />
       <CalculatorSection />
       <CoursesSec />
-      <HomeComments />
+      {/* <HomeComments /> */}
       <NewsClub />
       <FloatingNotificationManager />
     </div>
