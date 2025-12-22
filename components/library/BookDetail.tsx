@@ -29,47 +29,10 @@ const BookDetail = ({ bookId }: BookDetailProps) => {
       const downloadUrl = `/api/library/${bookId}/download/${type}`;
       console.log("Downloading from:", downloadUrl);
       
-      const response = await fetch(downloadUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': '*/*',
-        },
-      });
+      // بجای fetch، مستقیم window.location رو استفاده کن
+      // این باعث می‌شود تا browser خود درخواست کند و CORS مسائل نباشد
+      window.location.href = downloadUrl;
       
-      console.log("Download response status:", response.status);
-      console.log("Download response headers:", {
-        contentType: response.headers.get('content-type'),
-        contentLength: response.headers.get('content-length'),
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Download error response:", errorText, response.status);
-        throw new Error(`خطا در دانلود فایل (کد: ${response.status})`);
-      }
-
-      const blob = await response.blob();
-      console.log("Blob size:", blob.size, "Type:", blob.type);
-      
-      if (blob.size === 0) {
-        throw new Error("فایل خالی است یا موجود نیست");
-      }
-      
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      
-      // نام فایل بر اساس نوع
-      const fileName = 
-        type === "pdf" ? `${book?.slug}.pdf` :
-        type === "cover" ? `${book?.slug}-cover.jpg` :
-        `${book?.slug}-audio.mp3`;
-      
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("خطا در دانلود:", error);
       alert("خطا در دانلود فایل");

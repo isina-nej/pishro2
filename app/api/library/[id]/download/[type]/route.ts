@@ -94,10 +94,31 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
           );
         }
         const buffer = await uploadResponse.arrayBuffer();
+        
+        // تعیین نوع فایل و نام بر اساس type
+        let contentType = "application/octet-stream";
+        let fileName = book.slug;
+        
+        switch (type) {
+          case "pdf":
+            contentType = "application/pdf";
+            fileName = `${book.slug}.pdf`;
+            break;
+          case "cover":
+            contentType = "image/jpeg";
+            fileName = `${book.slug}-cover.jpg`;
+            break;
+          case "audio":
+            contentType = "audio/mpeg";
+            fileName = `${book.slug}-audio.mp3`;
+            break;
+        }
+        
         return new Response(buffer, {
           headers: {
-            "Content-Type": "application/pdf",
-            "Content-Disposition": `attachment; filename="${book.slug}.pdf"`,
+            "Content-Type": contentType,
+            "Content-Disposition": `attachment; filename="${fileName}"`,
+            "Cache-Control": "no-cache, no-store, must-revalidate",
           },
         });
       } catch (error) {

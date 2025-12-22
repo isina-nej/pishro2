@@ -29,6 +29,9 @@ const montserrat = localFont({
 export const metadata: Metadata = {
   title: "پیشرو سرمایه",
   description: "پیشرو",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
