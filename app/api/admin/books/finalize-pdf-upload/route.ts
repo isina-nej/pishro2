@@ -4,10 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, readFile, rm, mkdir } from "fs/promises";
-import { existsSync } from "fs";
+import { readFile, rm, mkdir } from "fs/promises";
+import { createWriteStream, existsSync } from "fs";
 import path from "path";
-import { v4 as uuidv4 } from "crypto";
 import {
   successResponse,
   validationError,
@@ -77,7 +76,7 @@ export async function POST(req: NextRequest) {
     const finalFileName = `${fileId}_${fileName}`;
     const finalPath = path.join(BOOKS_DIR, finalFileName);
     
-    const writeStream = require("fs").createWriteStream(finalPath);
+    const writeStream = createWriteStream(finalPath);
 
     for (let i = 0; i < totalChunks; i++) {
       const chunkPath = path.join(fileChunksDir, `chunk_${i}`);
@@ -116,10 +115,11 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: Error | unknown) {
+    const errorMessage = error instanceof Error ? error.message : "خطا در اختتام آپلود";
     console.error("❌ Finalize error:", error);
     const response = errorResponse(
-      error.message || "خطا در اختتام آپلود",
+      errorMessage,
       500
     );
 

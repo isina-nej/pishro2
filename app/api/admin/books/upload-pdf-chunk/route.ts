@@ -58,7 +58,6 @@ export async function POST(req: NextRequest) {
     const chunkIndex = formData.get("chunkIndex") as string;
     const totalChunks = formData.get("totalChunks") as string;
     const fileId = formData.get("fileId") as string;
-    const fileName = formData.get("fileName") as string;
 
     if (!chunk || !chunkIndex || !totalChunks || !fileId) {
       return validationError(
@@ -97,10 +96,11 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: Error | unknown) {
+    const errorMessage = error instanceof Error ? error.message : "خطا در آپلود تکه";
     console.error("❌ Chunk upload error:", error);
     const response = errorResponse(
-      error.message || "خطا در آپلود تکه",
+      errorMessage,
       500
     );
 
