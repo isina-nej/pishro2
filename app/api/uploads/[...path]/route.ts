@@ -29,13 +29,27 @@ export async function GET(
       return new NextResponse("Not Found", { status: 404 });
     }
 
-    if (!existsSync(fullPath)) {
-      console.warn(`File not found: ${fullPath}`);
-      return new NextResponse("Not Found", { status: 404 });
+    let actualPath = fullPath;
+    
+    if (!existsSync(actualPath)) {
+      // Fallback: try /pdfs subdirectory for book PDFs
+      if (filePath.startsWith("books/") && filePath.endsWith(".pdf")) {
+        const fallbackPath = join(uploadBaseDir, "books", "pdfs", filePath.replace("books/", ""));
+        if (existsSync(fallbackPath)) {
+          actualPath = fallbackPath;
+          console.log(`File not found at ${fullPath}, using fallback: ${fallbackPath}`);
+        } else {
+          console.warn(`File not found: ${fullPath} or fallback: ${fallbackPath}`);
+          return new NextResponse("Not Found", { status: 404 });
+        }
+      } else {
+        console.warn(`File not found: ${fullPath}`);
+        return new NextResponse("Not Found", { status: 404 });
+      }
     }
 
     // Read and serve the file
-    const fileBuffer = await readFile(fullPath);
+    const fileBuffer = await readFile(actualPath);
 
     // Determine MIME type based on file extension
     const ext = filePath.split(".").pop()?.toLowerCase();
