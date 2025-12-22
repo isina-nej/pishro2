@@ -85,4 +85,40 @@ export const config = {
     "/profile/:path*",
     "/api/:path*", // تمام API routes
   ],
+  // Increase timeout for large file uploads
+  api: {
+    bodyParser: {
+      sizeLimit: "100mb",
+    },
+  },
+};
+
+// Configure timeout for upload endpoints
+export function withTimeout(handler: any) {
+  return async (req: NextRequest, context: any) => {
+    const pathname = req.nextUrl.pathname;
+    
+    // برای API های آپلود، timeout بزرگتر
+    if (pathname.includes("/upload")) {
+      // این timeout برای development است
+      // برای production از vercel.json استفاده می‌شود
+      return new Promise((resolve) => {
+        const timer = setTimeout(() => {
+          resolve(new NextResponse("Request Timeout", { status: 408 }));
+        }, 5 * 60 * 1000); // 5 دقیقه
+        
+        Promise.resolve(handler(req, context))
+          .then((response) => {
+            clearTimeout(timer);
+            resolve(response);
+          })
+          .catch((error) => {
+            clearTimeout(timer);
+            resolve(new NextResponse("Internal Server Error", { status: 500 }));
+          });
+      });
+    }
+    
+    return handler(req, context);
+  };
 };

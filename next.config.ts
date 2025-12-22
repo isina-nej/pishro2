@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
     bodyParser: {
       sizeLimit: "100mb",
     },
+    // Increase timeout for chunked uploads (5 minutes)
+    responseLimit: "100mb",
+  },
+  // Custom server timeout for large uploads
+  serverRuntimeConfig: {
+    // خوشبختانه Next.js از این استفاده می‌کند
   },
   images: {
     remotePatterns: [
