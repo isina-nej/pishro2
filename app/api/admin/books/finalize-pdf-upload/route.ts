@@ -15,7 +15,7 @@ import {
 
 const UPLOAD_DIR = process.env.UPLOAD_BASE_DIR || "/opt/pishro_uploads";
 const CHUNKS_DIR = path.join(UPLOAD_DIR, "chunks");
-const BOOKS_DIR = path.join(UPLOAD_DIR, "books");
+const BOOKS_DIR = path.join(UPLOAD_DIR, "books", "pdfs");
 
 // CORS headers
 function corsHeaders(req: NextRequest) {
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
 
     console.log(`✅ PDF file finalized: ${finalFileName}`);
 
-    const fileUrl = `/api/uploads/books/${finalFileName}`;
+    const fileUrl = `/api/uploads/books/pdfs/${finalFileName}`;
 
     const response = successResponse({
       fileName: finalFileName,
