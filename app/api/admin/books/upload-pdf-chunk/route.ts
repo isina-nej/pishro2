@@ -101,6 +101,8 @@ export async function POST(req: NextRequest) {
     console.error("❌ Chunk upload error:", error);
     const response = errorResponse(
       errorMessage,
+      "CHUNK_UPLOAD_ERROR",
+      undefined,
       500
     );
 

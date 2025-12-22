@@ -120,6 +120,8 @@ export async function POST(req: NextRequest) {
     console.error("❌ Finalize error:", error);
     const response = errorResponse(
       errorMessage,
+      "FINALIZE_ERROR",
+      undefined,
       500
     );
 
