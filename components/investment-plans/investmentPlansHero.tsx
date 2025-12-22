@@ -8,6 +8,7 @@ import {
   Shield,
   BarChart3,
   Sparkles,
+  ArrowDown,
 } from "lucide-react";
 import { InvestmentPlans, InvestmentPlan, InvestmentTag } from "@prisma/client";
 import { Button } from "@/components/ui/button";

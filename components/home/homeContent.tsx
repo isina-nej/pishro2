@@ -5,7 +5,6 @@ import MobileLandingServer from "./mobileLanding.server";
 import MobileScrollSectionServer from "./mobileScrollSection.server";
 import CalculatorSection from "./calculatorSection";
 import CoursesSec from "@/components/utils/CoursesSec.server";
-import HomeComments from "./homeComments";
 import NewsClub from "./newsClub";
 import FloatingNotificationManager from "@/components/utils/floatingNotificationManager";
 
