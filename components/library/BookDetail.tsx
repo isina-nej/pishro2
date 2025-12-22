@@ -26,15 +26,35 @@ const BookDetail = ({ bookId }: BookDetailProps) => {
   const handleDownload = async (type: "pdf" | "cover" | "audio") => {
     try {
       setDownloading(type);
-      const response = await fetch(
-        `/api/library/${bookId}/download/${type}`
-      );
+      const downloadUrl = `/api/library/${bookId}/download/${type}`;
+      console.log("Downloading from:", downloadUrl);
+      
+      const response = await fetch(downloadUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': '*/*',
+        },
+      });
+      
+      console.log("Download response status:", response.status);
+      console.log("Download response headers:", {
+        contentType: response.headers.get('content-type'),
+        contentLength: response.headers.get('content-length'),
+      });
       
       if (!response.ok) {
-        throw new Error("خطا در دانلود فایل");
+        const errorText = await response.text();
+        console.error("Download error response:", errorText, response.status);
+        throw new Error(`خطا در دانلود فایل (کد: ${response.status})`);
       }
 
       const blob = await response.blob();
+      console.log("Blob size:", blob.size, "Type:", blob.type);
+      
+      if (blob.size === 0) {
+        throw new Error("فایل خالی است یا موجود نیست");
+      }
+      
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;

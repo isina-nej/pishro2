@@ -222,6 +222,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log("Book created successfully:", { bookId: book.id, fileUrl: book.fileUrl, cover: book.cover });
+
     // Fetch the book with related tags included
     const bookWithTags = await prisma.digitalBook.findUnique({
       where: { id: book.id },
@@ -236,7 +238,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log("Book created successfully:", book.id);
+    console.log("Book with tags:", bookWithTags);
     return createdResponse(bookWithTags, "Book created successfully");
   } catch (error) {
     console.error("Error creating book - Full error:", error);

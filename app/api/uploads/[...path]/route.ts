@@ -12,6 +12,8 @@ export async function GET(
     const { path } = await params;
     const filePath = path.join("/");
 
+    console.log("Upload serve request:", { path, filePath, UPLOAD_BASE_DIR: process.env.UPLOAD_BASE_DIR });
+
     // Security: prevent directory traversal
     if (filePath.includes("..") || filePath.startsWith("/")) {
       return new NextResponse("Forbidden", { status: 403 });
@@ -21,7 +23,11 @@ export async function GET(
     let uploadBaseDir = process.env.UPLOAD_BASE_DIR || join("D:", "pishro_uploads");
     uploadBaseDir = resolve(uploadBaseDir);
     
+    console.log("Resolved upload base dir:", uploadBaseDir);
+    
     const fullPath = join(uploadBaseDir, filePath);
+    
+    console.log("Full file path:", fullPath);
 
     // Verify the file exists and is within the uploads directory
     if (!fullPath.startsWith(uploadBaseDir)) {
@@ -32,14 +38,18 @@ export async function GET(
     let actualPath = fullPath;
     
     if (!existsSync(actualPath)) {
+      console.log(`File not found at primary path: ${actualPath}`);
+      
       // Fallback: try /pdfs subdirectory for book PDFs
       if (filePath.startsWith("books/") && filePath.endsWith(".pdf")) {
         const fallbackPath = join(uploadBaseDir, "books", "pdfs", filePath.replace("books/", ""));
+        console.log(`Trying fallback path: ${fallbackPath}`);
+        
         if (existsSync(fallbackPath)) {
           actualPath = fallbackPath;
-          console.log(`File not found at ${fullPath}, using fallback: ${fallbackPath}`);
+          console.log(`Using fallback path: ${fallbackPath}`);
         } else {
-          console.warn(`File not found: ${fullPath} or fallback: ${fallbackPath}`);
+          console.warn(`File not found at primary: ${fullPath} or fallback: ${fallbackPath}`);
           return new NextResponse("Not Found", { status: 404 });
         }
       } else {
@@ -50,6 +60,7 @@ export async function GET(
 
     // Read and serve the file
     const fileBuffer = await readFile(actualPath);
+    console.log(`Serving file: ${actualPath}, size: ${fileBuffer.length} bytes`);
 
     // Determine MIME type based on file extension
     const ext = filePath.split(".").pop()?.toLowerCase();

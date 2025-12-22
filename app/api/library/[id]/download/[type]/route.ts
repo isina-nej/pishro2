@@ -52,9 +52,16 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     }
 
     console.log(`[Download] File URL: ${fileUrl}`);
+    console.log(`[Download] Book data:`, { id, title: book.title, fileUrl, type });
 
     if (!fileUrl) {
-      console.error(`[Download] File URL is empty for type: ${type}`);
+      console.error(`[Download] File URL is empty for type: ${type}, Book data:`, {
+        id,
+        title: book.title,
+        fileUrl: book.fileUrl,
+        cover: book.cover,
+        audioUrl: book.audioUrl,
+      });
       return errorResponse(
         "این فایل برای این کتاب موجود نیست",
         ErrorCodes.NOT_FOUND
@@ -72,9 +79,37 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
       console.error(`[Download] Error updating download count:`, updateErr);
     }
 
-    // Redirect to file (whether local or external)
-    console.log(`[Download] Redirecting to: ${fileUrl}`);
+    // Return file content directly instead of redirecting
+    console.log(`[Download] Serving file from: ${fileUrl}`);
     
+    // If it's an API upload path, serve it directly
+    if (fileUrl.startsWith('/api/uploads/')) {
+      try {
+        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}${fileUrl}`);
+        if (!uploadResponse.ok) {
+          console.error(`[Download] Upload API returned ${uploadResponse.status}`);
+          return errorResponse(
+            "خطا در دسترسی به فایل",
+            ErrorCodes.NOT_FOUND
+          );
+        }
+        const buffer = await uploadResponse.arrayBuffer();
+        return new Response(buffer, {
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="${book.slug}.pdf"`,
+          },
+        });
+      } catch (error) {
+        console.error(`[Download] Error serving file:`, error);
+        return errorResponse(
+          "خطا در دسترسی به فایل",
+          ErrorCodes.INTERNAL_ERROR
+        );
+      }
+    }
+    
+    // For external URLs, redirect
     const response = new Response(null, {
       status: 302,
       headers: {
