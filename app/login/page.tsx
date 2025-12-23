@@ -52,8 +52,6 @@ const LoginPage = () => {
           </Button>
         </Link>
 
-        <p className="text-xs mt-8">سلام اوقاتتون بخیر</p>
-
         {showForgotPassword ? (
           <ForgotPasswordForm
             onBack={() => setShowForgotPassword(false)}

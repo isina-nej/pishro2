@@ -151,17 +151,6 @@ export function ForgotPasswordForm({
   if (step === "reset") {
     return (
       <div className="mt-8 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => setStep("otp")}
-          disabled={isLoading}
-          className="self-start -mt-4 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-        >
-          <ArrowRight className="ml-2 h-4 w-4" />
-          بازگشت
-        </Button>
-
         {/* Header */}
         <div className="text-center space-y-2 mb-4">
           <h2 className="text-xl font-bold text-gray-900">تنظیم رمز عبور جدید</h2>
@@ -226,18 +215,16 @@ export function ForgotPasswordForm({
   // Phone step (default)
   return (
     <div className="mt-8 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Back Button */}
-      {onBack && (
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          disabled={isLoading}
-          className="self-start -mt-4 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-        >
-          <ArrowRight className="ml-2 h-4 w-4" />
-          بازگشت
-        </Button>
-      )}
+      {/* Back Button - Navigate to login */}
+      <Button
+        variant="ghost"
+        onClick={onBack}
+        disabled={isLoading}
+        className="self-start -mt-4 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+      >
+        <ArrowRight className="ml-2 h-4 w-4" />
+        بازگشت
+      </Button>
 
       {/* Header */}
       <div className="text-center space-y-2 mb-4">
