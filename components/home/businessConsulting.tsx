@@ -19,18 +19,9 @@ const BusinessConsulting = () => {
         "0 0 0 rgba(0,0,0,0)",
       ],
       transition: {
-        scale: {
-          duration: 2,
-          repeat: Infinity,
-          repeatType: "loop",
-          ease: "easeInOut",
-        },
-        boxShadow: {
-          duration: 2,
-          repeat: Infinity,
-          repeatType: "loop",
-          ease: "easeInOut",
-        },
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut",
       },
     },
     hover: {

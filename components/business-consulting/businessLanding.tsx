@@ -42,7 +42,7 @@ const BusinessLanding = ({ businessConsultingData }: BusinessLandingProps) => {
         <h3 className="text-4xl lg:text-5xl font-bold leading-tight">
           {businessConsultingData.title}
         </h3>
-        <p className="text-white/90 text-lg max-w-xl mx-auto leading-relaxed">
+        <p className="text-white/90 text-base lg:text-lg max-w-2xl mx-auto leading-loose text-justify lg:text-right">
           {businessConsultingData.description}
         </p>
 

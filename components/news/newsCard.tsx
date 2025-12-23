@@ -66,13 +66,13 @@ const NewsCard = ({ data }: NewsCardProps) => {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-mySecondary to-mySecondary/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* تصویر */}
-        <div className="relative flex-shrink-0 w-full md:w-[220px] xl:w-[250px] h-[200px] md:min-h-[240px] md:h-full overflow-hidden">
+        <div className="relative flex-shrink-0 w-full md:w-[320px] xl:w-[380px] h-[200px] md:h-[180px] overflow-hidden">
           <Image
             src={data.coverImage ?? "/images/default-news.jpg"}
             alt={data.title}
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-            sizes="(max-width: 768px) 100vw, 260px"
+            sizes="(max-width: 768px) 100vw, 380px"
             priority={false}
           />
 
