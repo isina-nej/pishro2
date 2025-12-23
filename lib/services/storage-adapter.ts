@@ -26,9 +26,10 @@ export function getStorageConfig(): StorageConfig {
     process.env.UPLOAD_STORAGE_PATH ||
     "/var/www/uploads";
 
-  // URL پایه پیش‌فرض: از domain اصلی با prefix /uploads
+  // URL پایه پیش‌فرض: استفاده از /api/uploads endpoint
+  // این endpoint فایل‌ها را از UPLOAD_BASE_DIR سرو می‌کند
   const baseUrl =
-    process.env.UPLOAD_BASE_URL || "https://www.pishrosarmaye.com/uploads";
+    process.env.UPLOAD_BASE_URL || "/api/uploads";
 
   return {
     storagePath,
