@@ -19,9 +19,12 @@ export interface StorageConfig {
  * دریافت تنظیمات storage از environment variables
  */
 export function getStorageConfig(): StorageConfig {
-  // مسیر پیش‌فرض: /var/www/uploads
+  // مسیر پیش‌فرض: UPLOAD_BASE_DIR برای local development
+  // یا UPLOAD_STORAGE_PATH برای production
   const storagePath =
-    process.env.UPLOAD_STORAGE_PATH || "/var/www/uploads";
+    process.env.UPLOAD_BASE_DIR ||
+    process.env.UPLOAD_STORAGE_PATH ||
+    "/var/www/uploads";
 
   // URL پایه پیش‌فرض: از domain اصلی با prefix /uploads
   const baseUrl =
