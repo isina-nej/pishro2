@@ -14,17 +14,19 @@ const SkyRoomPageContent: React.FC<SkyRoomPageContentProps> = ({
 }) => {
   return (
     <div className="relative h-screen w-full overflow-hidden">
-      {/* Background Image Layer with Next.js Image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/skyroom/landing.jpg"
-          alt="Skyroom Background"
-          fill
-          priority
-          className="object-cover"
-        />
+      {/* Background Video Layer */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/api/uploads/videos/hamayesh-finalli.mp4" type="video/mp4" />
+        </video>
       </div>
-      <div className="absolute inset-0 bg-black/70 pointer-events-none z-0"></div>
+      <div className="absolute inset-0 bg-black/40 pointer-events-none z-0"></div>
 
       {/* Animated Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-950/20 via-purple-950/20 to-pink-950/20 pointer-events-none z-0">
