@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "motion/react";
 import { HiUsers, HiArrowLeft } from "react-icons/hi";
 import Link from "next/link";
