@@ -23,7 +23,7 @@ const SkyRoomPageContent: React.FC<SkyRoomPageContentProps> = ({
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/api/uploads/videos/hamayesh-finalli.mp4" type="video/mp4" />
+          <source src="/videos/hamayesh-finalli.mp4" type="video/mp4" />
         </video>
       </div>
       <div className="absolute inset-0 bg-black/40 pointer-events-none z-0"></div>
