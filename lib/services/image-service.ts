@@ -2,12 +2,27 @@
 import { prisma } from "@/lib/prisma";
 import { ImageCategory } from "@prisma/client";
 import crypto from "crypto";
-import sharp from "sharp";
 import {
   saveFileToStorage,
   deleteFileFromStorage,
   getRelativePathFromUrl,
 } from "./storage-adapter";
+
+// Lazy load sharp to avoid issues on incompatible CPU architectures
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let sharpModule: any = null;
+
+async function getSharp() {
+  if (!sharpModule) {
+    try {
+      sharpModule = (await import("sharp")).default;
+    } catch {
+      console.warn("Sharp module not available, image dimension detection will be skipped");
+      return null;
+    }
+  }
+  return sharpModule;
+}
 
 const IMAGES_FOLDER = "images"; // پوشه اصلی تصاویر
 
@@ -73,7 +88,11 @@ export async function getImageDimensions(
   buffer: Buffer
 ): Promise<{ width: number; height: number } | null> {
   try {
-    const metadata = await sharp(buffer).metadata();
+    const sharpModule = await getSharp();
+    if (!sharpModule) {
+      return null;
+    }
+    const metadata = await sharpModule(buffer).metadata();
     if (metadata.width && metadata.height) {
       return { width: metadata.width, height: metadata.height };
     }
